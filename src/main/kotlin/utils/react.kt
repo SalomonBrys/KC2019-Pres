@@ -1,7 +1,12 @@
 package ws.utils
 
 import kotlinext.js.jsObject
+import kotlinx.html.TD
+import kotlinx.html.TR
 import react.*
+import react.dom.RDOMBuilder
+import react.dom.td
+import react.dom.tr
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 

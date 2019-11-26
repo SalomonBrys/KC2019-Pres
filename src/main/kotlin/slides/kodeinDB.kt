@@ -3,52 +3,70 @@ package ws.slides
 import kotlinx.css.*
 import kotlinx.css.properties.ms
 import kotlinx.css.properties.transition
-import styled.css
-import styled.styledP
-import styled.styledSpan
+import styled.*
 import ws.comp.logo
-import ws.kpres.FadeIn
 import ws.kpres.PresentationBuilder
 import ws.kpres.SlideInfos
 
 
 private val infos = SlideInfos(
         stateCount = 2,
-        bodyStyle = {
-            div {
-                +"darker" {
-                    backgroundColor = Color("#46AF6D")
-                }
-            }
-        },
-        appearTransition = FadeIn
+        containerStyle = {
+            println(it)
+            backgroundColor = if (it < 1) Color("#46AF6D") else Color("#1B93D2")
+        }
 )
 
-fun PresentationBuilder.kodeinDB() = slide(infos) { state ->
+fun PresentationBuilder.kodeinDB() = slide(infos) { props ->
 
-    logo(division = "DB", zoom = 0.8 ) {
+    logo(
+            division = {
+                styledSpan {
+                    css {
+                        transition(::fontSize, 500.ms)
+                        fontSize = if (props.state >= 1) 1.em else 0.em
+                        verticalAlign = VerticalAlign.middle
+                    }
+                    +"DB"
+                }
+                styledSpan {
+                    css {
+                        transition(::fontSize, 500.ms)
+                        fontSize = if (props.state <= 0) 1.em else 0.em
+                        verticalAlign = VerticalAlign.middle
+                    }
+                    +"Framework"
+                }
+            },
+            zoom = 0.8
+    ) {
         styledP {
             css {
                 padding(0.em)
                 margin(0.em)
             }
-            styledSpan {
-                css {
-                    transition(::opacity, 300.ms)
-                    if (state >= 1) opacity = 0.4
-                }
-                +"painless "
+            +"painless "
+            styledImg(src = "images/kotlin-white.svg") {
+                css { height = 0.65.em }
             }
-            +"NoSQL"
+            +" "
             styledSpan {
                 css {
-                    transition(::opacity, 300.ms)
-                    if (state >= 1) opacity = 0.4
+                    transition(::fontSize, 500.ms)
+                    fontSize = if (props.state >= 1) 1.em else 0.em
+                    verticalAlign = VerticalAlign.middle
                 }
-                +" persistence"
+                +"embedded NoSQL"
+            }
+            styledSpan {
+                css {
+                    transition(::fontSize, 500.ms)
+                    fontSize = if (props.state <= 0) 1.em else 0.em
+                    verticalAlign = VerticalAlign.middle
+                }
+                +"multiplatform kotlin"
             }
         }
     }
-
 
 }

@@ -1,12 +1,10 @@
 package ws.kpres
 
 import kotlinx.css.*
+import kotlinx.html.classes
 import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.events.Event
-import react.RProps
-import react.functionalComponent
-import react.useEffectWithCleanup
-import react.useRef
+import react.*
 import styled.StyleSheet
 import styled.css
 import styled.getClassName
@@ -18,8 +16,11 @@ import kotlin.math.min
 
 
 interface SlideProps : RProps {
-    var style: (CSSBuilder.() -> Unit)?
+    var style: (CSSBuilder.(Int) -> Unit)?
+    var state: Int
 }
+
+open class SlideContentProps(val state: Int, val shouldAnim: Boolean) : RProps
 
 internal val Slide by functionalComponent<SlideProps> { props ->
     val inner = useRef<HTMLDivElement?>(null)
@@ -42,15 +43,16 @@ internal val Slide by functionalComponent<SlideProps> { props ->
             justifyContent = JustifyContent.center
             alignItems = Align.center
 
-            props.style?.invoke(this)
+            props.style?.invoke(this, props.state)
         }
 
         styledDiv {
+            attrs.classes = setOf("inner-slide")
             ref = inner
             css {
-                width = (1024.px - 4.em)
-                height = (640.px - 4.em)
-                padding(2.em)
+                width = (1024.px - 2.em)
+                height = (640.px - 2.em)
+                padding(1.em)
                 fontSize = 2.em
                 display = Display.flex
                 flexDirection = FlexDirection.column
@@ -59,6 +61,7 @@ internal val Slide by functionalComponent<SlideProps> { props ->
                 alignContent = Align.center
                 textAlign = TextAlign.center
                 overflow = Overflow.hidden
+                position = Position.relative
             }
 
             props.children()

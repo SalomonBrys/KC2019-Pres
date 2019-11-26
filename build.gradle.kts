@@ -35,8 +35,7 @@ kotlin {
             implementation(npm("styled-components", "4.3.2"))
             implementation(npm("core-js", "3.2.0"))
 
-//            implementation(npm("spectacle", "5.7.1"))
-//            implementation(npm("prop-types", "15.6.2"))
+            implementation(npm("highlight.js", "9.16.2"))
         }
     }
 }

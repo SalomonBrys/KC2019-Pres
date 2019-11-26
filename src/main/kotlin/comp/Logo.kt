@@ -9,7 +9,7 @@ import styled.*
 import ws.utils.getValue
 
 interface LogoProps : RProps {
-    var division: String
+    var division: RBuilder.() -> Unit
     var href: String?
     var zoom: Double?
 }
@@ -52,7 +52,7 @@ private val Logo by functionalComponent<LogoProps> { props ->
 
                     styledSpan {
                         css.fontWeight = FontWeight.w300
-                        +props.division
+                        props.division(this)
                     }
                 }
             }
@@ -74,6 +74,16 @@ private val Logo by functionalComponent<LogoProps> { props ->
 }
 
 fun RBuilder.logo(division: String, href: String? = null, zoom: Double = 1.0, handler: RHandler<LogoProps>) = child(
+        functionalComponent = Logo,
+        props = jsObject {
+            this.division = { +division }
+            this.href = href
+            this.zoom = zoom
+        },
+        handler = handler
+)
+
+fun RBuilder.logo(division: RBuilder.() -> Unit, href: String? = null, zoom: Double = 1.0, handler: RHandler<LogoProps>) = child(
         functionalComponent = Logo,
         props = jsObject {
             this.division = division

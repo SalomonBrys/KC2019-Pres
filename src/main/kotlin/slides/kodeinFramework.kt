@@ -1,6 +1,7 @@
 package ws.slides
 
 import kotlinx.css.*
+import kotlinx.css.properties.ms
 import kotlinx.css.properties.s
 import kotlinx.css.properties.transition
 import react.dom.img
@@ -10,9 +11,7 @@ import styled.css
 import styled.styledImg
 import styled.styledUl
 import ws.comp.logo
-import ws.kpres.FadeOut
-import ws.kpres.PresentationBuilder
-import ws.kpres.SlideInfos
+import ws.kpres.*
 import ws.utils.li
 
 
@@ -66,27 +65,28 @@ private fun CSSBuilder.targetsStyle(state: Int) {
 
 private val infos = SlideInfos(
         stateCount = 5,
-        bodyStyle = {
-            div {
-                +"darker" {
-                    backgroundColor = Color("#46AF6D")
-                }
-            }
+        containerStyle = {
+            backgroundColor = Color("#46AF6D")
+            transition(::background, 2000.ms)
         },
-        disappearTransition = FadeOut
+        inTransitions = Flip,
+        inTransitionDuration = 2000
 )
 
-fun PresentationBuilder.kodeinFramework() = slide(infos) { state ->
-    logo(division = "Framework", href = "https://kodein.org", zoom = 0.8 ) {
+fun PresentationBuilder.kodeinFramework() = slide(infos) { props ->
+    logo(division = "Framework", href = "https://kodein.org", zoom = 0.8) {
         +"painless "
         styledImg(src = "images/kotlin-white.svg") {
             css { height = 0.65.em }
         }
-        +" kotlin"
+        +" multiplatform kotlin"
     }
 
     styledUl {
-        css { targetsStyle(state) }
+        css {
+            textAlign = TextAlign.center
+            targetsStyle(props.state)
+        }
 
         li { +"Android" }
         li { +"iOS" }
