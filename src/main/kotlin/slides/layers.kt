@@ -64,6 +64,10 @@ private val slideStyle: CSSBuilder.(Int) -> Unit = { state ->
             backgroundColor = Color("#89AB0D")
         }
 
+        +"middleware" {
+            backgroundImage = Image("linear-gradient(to bottom right, #E8441F, #921F81)")
+        }
+
         span {
             flexGrow = 1.0
             flexBasis = FlexBasis.zero
@@ -80,16 +84,30 @@ private val slideStyle: CSSBuilder.(Int) -> Unit = { state ->
         ".a5" {
             transition("transform", 500.ms)
 
-            if (state >= 8)
+            if (state >= 10)
                 transform {
                     scale(1.4)
                 }
+        }
+
+        ".m1" {
+            transition(::height, 300.ms)
+            transition(::opacity, 300.ms)
+            height = if (state < 8) 0.em else 2.em
+            opacity = if (state < 8) 0.0 else 1.0
+        }
+
+        ".m2" {
+            transition(::height, 300.ms)
+            transition(::opacity, 300.ms)
+            height = if (state < 9) 0.em else 2.em
+            opacity = if (state < 9) 0.0 else 1.0
         }
     }
 }
 
 private val infos = SlideInfos(
-        stateCount = 9
+        stateCount = 11
 )
 
 fun PresentationBuilder.layers() = slide(infos) { props ->
@@ -105,6 +123,12 @@ fun PresentationBuilder.layers() = slide(infos) { props ->
         }
         div("entry large business a6") { +"API" }
 
+        div("layer m2") {
+            span {}
+            div("entry middleware") { +"Model Middlewares" }
+            span {}
+        }
+
         div("layer a5") {
             span {}
             div("entry business") { +"Cache" }
@@ -115,6 +139,12 @@ fun PresentationBuilder.layers() = slide(infos) { props ->
             div("entry small business a4") { +"KX.Serialization" }
             div("entry business a3") { +"Model" }
             div("entry small business a4") { +"Kryo" }
+        }
+
+        div("layer m1") {
+            span {}
+            div("entry middleware") { +"Data Middlewares" }
+            span {}
         }
 
         div("layer a2") {

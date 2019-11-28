@@ -1,5 +1,5 @@
 plugins {
-    kotlin("js") version "1.3.50"
+    kotlin("js") version "1.3.61"
 }
 
 version = "1.0"
@@ -19,7 +19,7 @@ kotlin {
 
             val reactVersion = "16.9.0"
             val reactRouterVersion = "4.3.1"
-            val kotlinWrapperVersion = "pre.87-kotlin-1.3.50"
+            val kotlinWrapperVersion = "pre.88-kotlin-1.3.60"
 
             api("org.jetbrains:kotlin-react-dom:$reactVersion-$kotlinWrapperVersion")
             api("org.jetbrains:kotlin-react-router-dom:$reactRouterVersion-$kotlinWrapperVersion")

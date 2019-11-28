@@ -16,7 +16,7 @@ import ws.utils.getValue
 import ws.utils.provideDelegate
 
 
-private val Slide by functionalComponent<SlideContentProps> { props ->
+private val Slide by functionalComponent<SlideContentProps> {
     var loaded by useState(false)
 
     styledImg {

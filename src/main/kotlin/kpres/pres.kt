@@ -6,6 +6,7 @@ import kotlinx.html.classes
 import kotlinx.html.tabIndex
 import org.w3c.dom.HTMLDivElement
 import react.*
+import react.dom.div
 import react.dom.h1
 import react.router.dom.hashRouter
 import react.router.dom.route
@@ -170,11 +171,8 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
 
     styledDiv {
         ref = containerDiv
-        attrs.classes = setOf("pres-container")
         css {
-            width = 100.pct
-            height = 100.pct
-            position = Position.relative
+            +"pres-container"
             outline = Outline.none
             overflow = Overflow.hidden
 
@@ -186,13 +184,21 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
         }
         attrs.tabIndex = "0"
 
-        if (props.slideInfos(currentPosition)?.debugAlign == true || disappearState != null) {
-            val transitionSet = props.transitionSet(previousPosition) { if (disappearState?.forward == true) outTransitions else inTransitions }
-            slideContainer(previousPosition, transitionSet.disappear, disappearState, props)
-        }
+        styledDiv {
+            css {
+                +"inner-container"
+                width = 100.pct
+                height = 100.pct
+                position = Position.relative
+            }
+            if (props.slideInfos(currentPosition)?.debugAlign == true || disappearState != null) {
+                val transitionSet = props.transitionSet(previousPosition) { if (disappearState?.forward == true) outTransitions else inTransitions }
+                slideContainer(previousPosition, transitionSet.disappear, disappearState, props)
+            }
 
-        val transitionSet = props.transitionSet(currentPosition) { if (appearState?.forward == true) inTransitions else outTransitions }
-        slideContainer(currentPosition, transitionSet.appear, appearState, props)
+            val transitionSet = props.transitionSet(currentPosition) { if (appearState?.forward == true) inTransitions else outTransitions }
+            slideContainer(currentPosition, transitionSet.appear, appearState, props)
+        }
     }
 }
 

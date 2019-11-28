@@ -13,7 +13,7 @@ import kotlin.browser.document
 
 fun CSSBuilder.globalCSS() {
     body {
-        backgroundImage = Image("linear-gradient(to bottom right, #E8441F, #921F81)")
+//        backgroundImage = Image("linear-gradient(to bottom right, #E8441F, #921F81)")
         fontFamily = "Picon"
         color = Color.white
         margin(0.em)
@@ -21,6 +21,10 @@ fun CSSBuilder.globalCSS() {
 
         div {
             +"pres-container" {
+                backgroundImage = Image("linear-gradient(to bottom right, #E8441F, #921F81)")
+            }
+
+            +"inner-container" {
                 backgroundColor = Color("rgba(0, 0, 0, 0.8)")
                 transition(::background, 500.ms)
             }
@@ -68,21 +72,26 @@ fun main() {
             opinion()
             kodeinDB()
             layers()
-            contract()
+            contractImmut()
             immutability()
             open()
             path()
             mppModel()
             query()
-
-            // Find options ?
-            // Composite
-            // reactive
-            // polymorphism & type table
-            // migration
-            // middleware
-            // release
-            // future
+            composite()
+            contractId()
+            batchAndSnapshot()
+            reactive()
+            reactiveLocal()
+            reactiveGlobal()
+            reactiveContext()
+            people()
+            polymorphism()
+            mppPolymorphism()
+            migration()
+            release()
+            next()
+            thanks()
         }
     }
 }

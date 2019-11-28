@@ -14,7 +14,7 @@ private val infos = SlideInfos(
         stateCount = 6
 )
 
-fun PresentationBuilder.contract() = slide(infos) { props ->
+fun PresentationBuilder.contractImmut() = slide(infos) { props ->
     h1 {
         styledSpan {
             css {

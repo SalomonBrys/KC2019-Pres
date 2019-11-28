@@ -77,7 +77,10 @@ private val SQLiteSlide by functionalComponent<SlideContentProps> { props ->
         }
     }
 
-    h1 {
+    styledH1 {
+        css {
+            margin(0.em, 0.em, 0.5.em, 0.em)
+        }
         +" SQLite"
     }
 
@@ -88,6 +91,7 @@ private val SQLiteSlide by functionalComponent<SlideContentProps> { props ->
             display = Display.flex
             flexDirection = FlexDirection.column
             alignSelf = Align.stretch
+            height = 14.em
             "li" {
                 "span" {
                     opacity = 1.0
@@ -110,7 +114,7 @@ private val SQLiteSlide by functionalComponent<SlideContentProps> { props ->
         entry(props.state, 0, "Models", "kotlin",
                 """
                     data class User(
-                        val id: Int,
+                        val uid: Int,
                         val firstName: String,
                         val lastName: String
                         val address: Address?
@@ -121,7 +125,7 @@ private val SQLiteSlide by functionalComponent<SlideContentProps> { props ->
         entry(props.state, 1, "Structure", "SQL",
                 """ 
                     CREATE TABLE User(
-                        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                        uid INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                         firstName TEXT NOT NULL,
                         lastName TEXT NOT NULL,
                         addressId INT
@@ -133,8 +137,7 @@ private val SQLiteSlide by functionalComponent<SlideContentProps> { props ->
                 """
                     fun getDB() =
                         if (!db_exists("mydb.sql"))
-                            create_db()
-                                .also { initiate_schema(it) }
+                            create_db().also { initiate_schema(it) }
                         else
                             open_db("mydb.sql")
                 """.trimIndent()
@@ -143,10 +146,10 @@ private val SQLiteSlide by functionalComponent<SlideContentProps> { props ->
         entry(props.state, 3, "ORM out", "kotlin",
                 """
                     fun SQLResult.toUser() = User(
-                        firstName = this.getString("firstName"),
-                        lastName = this.getString("lastName"),
-                        address = db.getAddress(
-                                this.getString("addressId"))
+                        uid = getInt("uid")
+                        firstName = getString("firstName"),
+                        lastName = getString("lastName"),
+                        address = db.getAddress(getString("addressId"))
                     )
                 """.trimIndent()
         )
@@ -165,9 +168,7 @@ private val SQLiteSlide by functionalComponent<SlideContentProps> { props ->
         entry(props.state, 5, "Query", "kotlin",
                 """
                     fun SqlDb.getUserByLastName(lastName: String) =
-                        execQuery(
-                            "GET * FROM Users WHERE lastName = ?"
-                        )
+                        execQuery("GET * FROM Users WHERE lastName = ?")
                         .map { it.toUser() }
                         .toList()
                 """.trimIndent()

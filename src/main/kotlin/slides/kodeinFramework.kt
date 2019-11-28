@@ -66,8 +66,10 @@ private fun CSSBuilder.targetsStyle(state: Int) {
 private val infos = SlideInfos(
         stateCount = 5,
         containerStyle = {
-            backgroundColor = Color("#46AF6D")
-            transition(::background, 2000.ms)
+            ".inner-container" {
+                backgroundColor = Color("#46AF6D")
+                transition(::background, 2000.ms)
+            }
         },
         inTransitions = Flip,
         inTransitionDuration = 2000

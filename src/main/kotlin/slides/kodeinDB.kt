@@ -12,8 +12,9 @@ import ws.kpres.SlideInfos
 private val infos = SlideInfos(
         stateCount = 2,
         containerStyle = {
-            println(it)
-            backgroundColor = if (it < 1) Color("#46AF6D") else Color("#1B93D2")
+            ".inner-container" {
+                backgroundColor = if (it < 1) Color("#46AF6D") else Color("#1B93D2")
+            }
         }
 )
 
