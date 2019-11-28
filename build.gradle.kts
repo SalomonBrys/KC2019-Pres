@@ -1,5 +1,6 @@
 plugins {
     kotlin("js") version "1.3.61"
+    id("org.ajoberstar.git-publish") version "2.1.1"
 }
 
 version = "1.0"
@@ -39,3 +40,20 @@ kotlin {
         }
     }
 }
+
+gitPublish {
+    repoUri.set("git@github.com:SalomonBrys/KC2019-Pres.git")
+    branch.set("gh-pages")
+
+    contents {
+        val processResources = tasks["processResources"] as ProcessResources
+        from(processResources.outputs.files)
+        val browserWebpack = tasks["browserWebpack"] as org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+        from(browserWebpack.outputFile)
+    }
+
+    preserve {
+        include("CNAME")
+    }
+}
+tasks["gitPublishCopy"].dependsOn("assemble")

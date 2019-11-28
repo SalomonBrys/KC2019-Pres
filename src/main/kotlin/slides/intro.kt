@@ -32,10 +32,10 @@ fun PresentationBuilder.intro() = slide {
     styledH3 {
         css {
             fontSize = 0.8.em
-            textAlign = TextAlign.left
             fontWeight = FontWeight.w400
             width = 28.5.em
-            marginTop = 2.em
+            textAlign = TextAlign.left
+            marginTop = 0.5.em
         }
         styledA(href = "https://twitter.com/salomonbrys") {
             css {
@@ -49,5 +49,18 @@ fun PresentationBuilder.intro() = slide {
         +"Copenhagen"
         br {}
         +"Denmark"
+
+        styledA(href = "https://salomonbrys.github.io/KC2019-Pres") {
+            css {
+                display = Display.block
+                marginTop = 4.em
+                fontSize = 0.75.em
+                color = Color("#007bfa")
+                textDecoration = TextDecoration.none
+            }
+
+            +"salomonbrys.github.io/KC2019-Pres"
+        }
     }
+
 }
