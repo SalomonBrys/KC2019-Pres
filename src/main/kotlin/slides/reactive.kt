@@ -10,7 +10,7 @@ import ws.kpres.SlideInfos
 
 
 private val infos = SlideInfos(
-        stateCount = 10
+        stateCount = 9
 )
 
 fun PresentationBuilder.reactive() = slide(infos) { props ->
@@ -167,8 +167,6 @@ fun PresentationBuilder.reactive() = slide(infos) { props ->
                 states(2..99)
                 if (props.state in 6..7) {
                     transform { translateY(5.4.em) }
-                } else if (props.state >= 9) {
-                    transform { scale(1.5) }
                 }
             }
             +"Database"

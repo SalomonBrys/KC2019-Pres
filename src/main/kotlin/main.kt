@@ -14,6 +14,7 @@ import kotlin.browser.document
 fun CSSBuilder.globalCSS() {
     body {
 //        backgroundImage = Image("linear-gradient(to bottom right, #E8441F, #921F81)")
+        backgroundColor = Color.silver
         fontFamily = "Picon"
         color = Color.white
         margin(0.em)

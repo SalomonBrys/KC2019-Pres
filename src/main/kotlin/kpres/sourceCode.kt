@@ -23,7 +23,6 @@ private val SourceCode by functionalComponent<SourceCodeProps> { props ->
 
     val code = useRef<HTMLElement?>(null)
     useEffect(listOf(props.lang, props.code)) {
-        console.log("Highlighting")
         hljs.highlightBlock(code.current!!)
     }
 

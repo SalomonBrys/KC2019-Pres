@@ -23,11 +23,12 @@ interface SlideProps : RProps {
 open class SlideContentProps(val state: Int, val shouldAnim: Boolean) : RProps
 
 internal val Slide by functionalComponent<SlideProps> { props ->
+    val outer = useRef<HTMLDivElement?>(null)
     val inner = useRef<HTMLDivElement?>(null)
 
     useEffectWithCleanup {
         val listener = { _: Event? ->
-            val factor = min(window.innerWidth.toDouble() / 1024.0, window.innerHeight.toDouble() / 640.0).takeIf { it > 1.0 } ?: 1.0
+            val factor = min(outer.current!!.offsetWidth.toDouble() / 1024.0, outer.current!!.offsetHeight.toDouble() / 640.0).takeIf { it > 1.0 } ?: 1.0
             inner.current!!.style.transform = "scale(${factor})"
         }
         listener(null)
@@ -36,6 +37,7 @@ internal val Slide by functionalComponent<SlideProps> { props ->
     }
 
     styledDiv {
+        ref = outer
         css {
             width = 100.pct
             height = 100.pct
