@@ -11,6 +11,7 @@ import react.*
 import react.dom.h1
 import react.router.dom.hashRouter
 import react.router.dom.route
+import styled.StyledDOMBuilder
 import styled.css
 import styled.styledDiv
 import ws.utils.getValue
@@ -29,7 +30,8 @@ data class SlideInfos(
         val inTransitions: Transition.Set? = null,
         val outTransitions: Transition.Set? = null,
         val inTransitionDuration: Int? = null,
-        val debugAlign: Boolean = false
+        val debugAlign: Boolean = false,
+        val notes: StyledDOMBuilder<*>.(Int) -> Unit = {}
 ) {
     init {
         require(stateCount >= 1)
@@ -41,14 +43,14 @@ private interface RouteProps: RProps {
     val state: String?
 }
 
-private enum class Mode {
+internal enum class Mode {
     OVERVIEW,
     PRESENTER
 }
 
 private fun Set<Mode>.params() = if (isEmpty()) "" else "mode=" + joinToString(separator = ",") { it.name.toLowerCase() }
 
-private data class SlidePosition(val slide: Int, val state: Int)
+internal data class SlidePosition(val slide: Int, val state: Int)
 
 sealed class TransitionState {
     abstract val forward: Boolean
@@ -56,88 +58,14 @@ sealed class TransitionState {
     class Execute(val state: Int, val duration: Int, override val forward: Boolean, val remaining: Int) : TransitionState()
 }
 
-private fun useTransitionState(getTransitionDuration: (Boolean) -> Int, getTransition: (Boolean) -> Transition): Pair<TransitionState?, (Boolean) -> Unit> {
-    var transitionState by useState<TransitionState?>(null)
-
-    useEffectWithCleanup(listOf(transitionState)) {
-        val state = transitionState
-        val timerId = when (state) {
-            is TransitionState.Prepare -> {
-                val transitionDuration = getTransitionDuration(state.forward)
-                val stateDuration = getTransition(state.forward).stateDuration(transitionDuration, 0).takeIf { it in 0..transitionDuration } ?: transitionDuration
-                window.setTimeout({ transitionState = TransitionState.Execute(0, stateDuration, state.forward, transitionDuration - stateDuration) }, 1)
-            }
-            is TransitionState.Execute -> {
-                when (state.remaining) {
-                    0 -> window.setTimeout({ transitionState = null }, state.duration)
-                    else -> {
-                        val stateDuration = getTransition(state.forward).stateDuration(state.remaining, state.state + 1).takeIf { it in 0..state.remaining } ?: state.remaining
-                        window.setTimeout({ transitionState = TransitionState.Execute(state.state + 1, stateDuration, state.forward, state.remaining - stateDuration) }, state.duration)
-                    }
-                }
-            }
-            null -> null
-        }
-        if (timerId != null) ({ window.clearTimeout(timerId) })
-        else ({})
-    }
-
-    return transitionState to { forward: Boolean -> transitionState = TransitionState.Prepare(forward) }
-}
-
-private class SlideRender(
+internal class SlideRender(
         val currentPosition: SlidePosition,
         val previousPosition: SlidePosition,
         val appearState: TransitionState?,
         val disappearState: TransitionState?
 )
 
-private class SlideContainerProps(val presProps: PresentationProps, val position: SlidePosition, val style: CSSBuilder.() -> Unit, val render: RBuilder.(SlideRender) -> Unit) : RProps
-private val slideContainer by functionalComponent<SlideContainerProps> { props ->
-    var currentPosition by useState(props.position)
-    var previousPosition by useState(SlidePosition(0, 0))
-
-    val getTransitionDuration = { forward: Boolean -> (if (forward) props.presProps.slideInfos(currentPosition) else props.presProps.slideInfos(previousPosition))?.inTransitionDuration ?: props.presProps.defaultTransitionDuration }
-    val (appearState, startAppear) = useTransitionState(getTransitionDuration) { props.presProps.transitionSet(currentPosition) { if (it) inTransitions else outTransitions }.appear }
-    val (disappearState, startDisappear) = useTransitionState(getTransitionDuration) { props.presProps.transitionSet(previousPosition) { if (it) outTransitions else inTransitions }.disappear }
-
-    useEffect(listOf(props.position.slide, props.position.state)) {
-        if (currentPosition.slide != props.position.slide) {
-            val forward = props.position.slide > currentPosition.slide
-            startAppear(forward)
-            startDisappear(forward)
-            previousPosition = currentPosition
-        }
-        currentPosition = props.position
-    }
-
-    styledDiv {
-        this.key = "container"
-        css {
-            +"pres-container"
-            position = Position.absolute
-            top = 0.pct
-            left = 0.pct
-            width = 100.pct
-            height = 100.pct
-            overflow = Overflow.hidden
-            (props.style)()
-        }
-
-        styledDiv {
-            css {
-                +"inner-container"
-                width = 100.pct
-                height = 100.pct
-                position = Position.relative
-            }
-
-            (props.render)(SlideRender(currentPosition, previousPosition, appearState, disappearState))
-        }
-    }
-}
-
-private class PresentationProps(
+internal class PresentationProps(
         val slides: List<Pair<SlideInfos, SlideHandler>>,
         val position: SlidePosition,
         val defaultTransitions: Transition.Set,
@@ -145,8 +73,8 @@ private class PresentationProps(
         val modes: Set<Mode>
 ) : RProps
 
-private fun PresentationProps.slideInfos(index: SlidePosition) = index.slide.takeIf { it in 0..slides.lastIndex } ?.let { slides[it].first }
-private fun PresentationProps.transitionSet(index: SlidePosition, select: SlideInfos.() -> Transition.Set?) = slideInfos(index)?.select() ?: defaultTransitions
+internal fun PresentationProps.slideInfos(index: SlidePosition) = slides[index.slide].first
+internal fun PresentationProps.transitionSet(index: SlidePosition, select: SlideInfos.() -> Transition.Set?) = slideInfos(index).select() ?: defaultTransitions
 
 private val Presentation by functionalComponent<PresentationProps> { props ->
     val containerDiv = useRef<HTMLDivElement?>(null)
@@ -245,7 +173,7 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
 
         fun RBuilder.slide(position: SlidePosition, transition: Transition?, transitionState: TransitionState?, keyPostfix: String = ""/*, overviewDelta: Int? = null*/) {
             styledDiv {
-                if (position.slide != -1) key = "slide-${position.slide}$keyPostfix"
+                key = "slide-${position.slide}$keyPostfix"
 
                 css {
                     width = 100.pct
@@ -294,10 +222,8 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
                                     style = {
                                         universal { put("transition", "none !important") }
 
-                                        infos.containerStyle.let {
-                                            specific {
-                                                it(if (i < props.position.slide) infos.stateCount - 1 else 0)
-                                            }
+                                        specific {
+                                            (infos.containerStyle)(if (i < props.position.slide) infos.stateCount - 1 else 0)
                                         }
 
                                         val overviewDelta = i - props.position.slide
@@ -333,10 +259,8 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
                                         translate(2.pct, 2.pct)
                                         scale(0.50)
                                     }
-                                    props.slideInfos(props.position)?.containerStyle?.let {
-                                        specific {
-                                            it(props.position.state)
-                                        }
+                                    specific {
+                                        (props.slideInfos(props.position).containerStyle)(props.position.state)
                                     }
                                     boxShadow(Color.black, blurRadius = 1.2.em, spreadRadius = 0.5.em)
                                 }
@@ -364,10 +288,8 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
                                         translate(4.5.pct, (-2).pct)
                                         scale(0.44)
                                     }
-                                    props.slideInfos(nextPosition)?.containerStyle?.let {
-                                        specific {
-                                            it(nextPosition.state)
-                                        }
+                                    specific {
+                                        (props.slideInfos(nextPosition).containerStyle)(nextPosition.state)
                                     }
                                     boxShadow(Color.black, blurRadius = 1.2.em)
                                 }
@@ -383,6 +305,20 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
                 ) {
                     key = "container-n"
                 }
+
+                styledDiv {
+                    css {
+                        position = Position.absolute
+                        top = 2.pct
+                        right = 2.pct
+                        width = 45.pct
+                        height = 96.pct
+
+                        fontSize = 1.6.em
+                        color = Color.black
+                    }
+                    (props.slideInfos(props.position).notes)(props.position.state)
+                }
             }
             else -> {
                 child(
@@ -391,14 +327,12 @@ private val Presentation by functionalComponent<PresentationProps> { props ->
                                 presProps = props,
                                 position = props.position,
                                 style = {
-                                    props.slideInfos(props.position)?.containerStyle?.let {
-                                        specific {
-                                            it(props.position.state)
-                                        }
+                                    specific {
+                                        (props.slideInfos(props.position).containerStyle)(props.position.state)
                                     }
                                 }
                         ) {
-                            if (props.slideInfos(it.currentPosition)?.debugAlign == true || it.disappearState != null) {
+                            if (props.slideInfos(it.currentPosition).debugAlign || it.disappearState != null) {
                                 val transitionSet = props.transitionSet(it.previousPosition) { if (it.disappearState?.forward == true) outTransitions else inTransitions }
                                 slide(it.previousPosition, transitionSet.disappear, it.disappearState)
                             }

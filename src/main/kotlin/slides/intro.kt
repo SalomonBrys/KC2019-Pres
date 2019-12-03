@@ -6,7 +6,17 @@ import react.dom.br
 import react.dom.h1
 import styled.*
 import ws.kpres.PresentationBuilder
+import ws.kpres.SlideInfos
 
+
+private val infos = SlideInfos(
+        notes = {
+            css {
+
+            }
+            +"Hello everyone, thank you for joining me."
+        }
+)
 
 fun PresentationBuilder.intro() = slide {
     attrs.style = {

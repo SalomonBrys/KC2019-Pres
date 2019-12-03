@@ -37,6 +37,7 @@ kotlin {
             implementation(npm("core-js", "3.2.0"))
 
             implementation(npm("highlight.js", "9.16.2"))
+            implementation(npm("react-markdown", "4.2.2"))
         }
     }
 }
